@@ -1,0 +1,2 @@
+// Generated release signing config — password in app/keystore/.keystore-pass.txt
+// Keep .keystore-pass.txt OUT of git (already gitignored)

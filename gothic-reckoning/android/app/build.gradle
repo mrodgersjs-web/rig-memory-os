@@ -3,6 +3,21 @@ apply plugin: 'com.android.application'
 android {
     namespace "com.rodgersintelligence.gothicreckoning"
     compileSdk rootProject.ext.compileSdkVersion
+    signingConfigs {
+        release {
+            def keystoreFile = rootProject.file('app/keystore/gothic-reckoning-release.jks')
+            def keystorePassFile = rootProject.file('app/keystore/.keystore-pass.txt')
+            if (keystoreFile.exists() && keystorePassFile.exists()) {
+                def pass = keystorePassFile.text.trim()
+                keyAlias 'gothic-reckoning'
+                keyPassword pass
+                storeFile keystoreFile
+                storePassword pass
+            } else {
+                println "WARN: release signing config not found, building unsigned release"
+            }
+        }
+    }
     defaultConfig {
         applicationId "com.rodgersintelligence.gothicreckoning"
         minSdkVersion rootProject.ext.minSdkVersion
@@ -20,6 +35,9 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            if (signingConfigs.findByName('release')) {
+                signingConfig signingConfigs.release
+            }
         }
     }
 }
