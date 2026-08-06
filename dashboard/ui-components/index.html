@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RIG UI Components — Functional · Glassmorphic · NOIR/Gold</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Hanken+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+ --noir:#0A0806;--noir-lift:#12100C;--noir-float:#1A1712;
+ --gold:#C8A96E;--gold-light:#D4BC8B;--gold-dark:#A88A50;
+ --gold-glow:rgba(200,169,110,.28);--gold-hair:rgba(200,169,110,.18);--gold-subtle:rgba(200,169,110,.08);
+ --warm-white:#F5F0EB;--stone:#A09890;--charcoal:#6A6258;
+ --moss:#5B8C5A;--red:#C44536;
+ --glass-bg:rgba(18,16,12,.65);--glass-border:rgba(200,169,110,.15);
+ --serif:"Cormorant Garamond",Georgia,serif;
+ --sans:"Hanken Grotesk",system-ui,sans-serif;
+ --mono:"JetBrains Mono",monospace;
+ --ease:cubic-bezier(.16,1,.3,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--noir);color:var(--warm-white);font-family:var(--sans);font-weight:300;line-height:1.6;-webkit-font-smoothing:antialiased;padding-bottom:4rem}
+
+/* GLASS MORPHISM BASE */
+.glass{
+ background:var(--glass-bg);
+ backdrop-filter:blur(20px) saturate(1.2);
+ -webkit-backdrop-filter:blur(20px) saturate(1.2);
+ border:1px solid var(--glass-border);
+ border-radius:16px;
+ box-shadow:0 8px 32px rgba(0,0,0,.4),inset 0 1px 0 rgba(200,169,110,.08);
+ transition:all .3s var(--ease);
+}
+.glass:hover{border-color:rgba(200,169,110,.3);box-shadow:0 12px 40px rgba(0,0,0,.5),0 0 20px var(--gold-glow),inset 0 1px 0 rgba(200,169,110,.12)}
+
+/* SECTION LAYOUT */
+.demo-section{padding:2.5rem;max-width:1000px;margin:0 auto}
+.demo-section:not(:last-child){border-bottom:1px solid rgba(200,169,110,.06)}
+.demo-label{font-family:var(--mono);font-size:.65rem;color:var(--gold);text-transform:uppercase;letter-spacing:.15em;margin-bottom:.5rem}
+.demo-section h2{font-family:var(--serif);font-size:1.6rem;font-weight:500;margin-bottom:1.5rem}
+.demo-section h2 em{color:var(--gold);font-style:italic}
+.demo-row{display:flex;gap:1rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem}
+
+/* 
+ 1. BUTTONS — real, clickable, golden glow
+ */
+.rig-btn{
+ display:inline-flex;align-items:center;justify-content:center;gap:.5rem;
+ padding:.875rem 2rem;border:none;cursor:pointer;
+ font-family:var(--sans);font-weight:600;font-size:.9rem;letter-spacing:.01em;
+ border-radius:10px;text-decoration:none;
+ transition:all .25s var(--ease);
+ position:relative;overflow:hidden;
+}
+.rig-btn::before{
+ content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;
+ background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);
+ transition:left .5s var(--ease);
+}
+.rig-btn:hover::before{left:100%}
+
+.rig-btn-gold{
+ background:linear-gradient(135deg,var(--gold) 0%,var(--gold-dark) 100%);
+ color:var(--noir);
+ box-shadow:0 4px 20px rgba(200,169,110,.3),inset 0 1px 0 rgba(255,255,255,.2);
+}
+.rig-btn-gold:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(200,169,110,.45),inset 0 1px 0 rgba(255,255,255,.3)}
+.rig-btn-gold:active{transform:translateY(0)}
+
+.rig-btn-glass{
+ background:var(--glass-bg);backdrop-filter:blur(12px);
+ border:1px solid var(--glass-border);color:var(--warm-white);
+ box-shadow:0 4px 16px rgba(0,0,0,.3);
+}
+.rig-btn-glass:hover{border-color:var(--gold);color:var(--gold);background:rgba(200,169,110,.08)}
+
+.rig-btn-ghost{background:transparent;border:1px solid rgba(200,169,110,.25);color:var(--stone)}
+.rig-btn-ghost:hover{border-color:var(--gold);color:var(--gold);background:var(--gold-subtle)}
+
+.rig-btn-lg{padding:1.1rem 2.8rem;font-size:1rem;border-radius:12px}
+.rig-btn-sm{padding:.5rem 1.1rem;font-size:.78rem;border-radius:8px}
+.rig-btn-block{display:flex;width:100%}
+
+/* 
+ 2. CARDS — real glassmorphic containers
+ */
+.rig-card{padding:1.75rem}
+.rig-card-stat{text-align:center;padding:1.5rem}
+.rig-card-stat .num{font-family:var(--serif);font-size:2.2rem;color:var(--gold);font-weight:500;line-height:1;display:block}
+.rig-card-stat .label{font-family:var(--mono);font-size:.6rem;color:var(--stone);text-transform:uppercase;letter-spacing:.08em;display:block;margin-top:.3rem}
+.rig-card-feature{display:flex;flex-direction:column;gap:.5rem}
+.rig-card-feature .icon{width:40px;height:40px;border-radius:10px;background:var(--gold-subtle);display:flex;align-items:center;justify-content:center;font-size:1.2rem;margin-bottom:.5rem}
+.rig-card-feature h3{font-family:var(--serif);font-size:1.3rem;font-weight:500}
+.rig-card-feature p{color:var(--stone);font-size:.85rem;line-height:1.5}
+
+/* 
+ 3. FORM INPUTS — real, typeable, golden focus glow
+ */
+.rig-input{
+ width:100%;padding:.85rem 1.1rem;
+ background:rgba(10,8,6,.6);backdrop-filter:blur(8px);
+ border:1px solid var(--glass-border);border-radius:10px;
+ color:var(--warm-white);font-family:var(--sans);font-size:.9rem;font-weight:300;
+ transition:all .25s var(--ease);
+ caret-color:var(--gold);
+}
+.rig-input::placeholder{color:var(--charcoal)}
+.rig-input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-subtle),0 0 20px rgba(200,169,110,.1);background:rgba(10,8,6,.8)}
+.rig-textarea{min-height:90px;resize:vertical;font-family:var(--sans)}
+.rig-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23C8A96E' d='M6 8L0 0h12z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center;padding-right:2.5rem}
+.rig-field{margin-bottom:1rem}
+.rig-field label{display:block;font-size:.78rem;color:var(--warm-white);margin-bottom:.4rem;font-weight:500;letter-spacing:.02em}
+.rig-field label .req{color:var(--gold)}
+
+/* 
+ 4. TOGGLE SWITCH — real, flips on click
+ */
+.rig-toggle{position:relative;width:52px;height:28px;cursor:pointer;display:inline-block}
+.rig-toggle input{opacity:0;width:0;height:0;position:absolute}
+.rig-toggle-slider{
+ position:absolute;inset:0;background:rgba(10,8,6,.8);border:1px solid var(--glass-border);
+ border-radius:28px;transition:all .3s var(--ease);
+}
+.rig-toggle-slider::before{
+ content:'';position:absolute;width:20px;height:20px;left:3px;top:3px;
+ background:var(--stone);border-radius:50%;transition:all .3s var(--ease);
+}
+.rig-toggle input:checked+.rig-toggle-slider{background:var(--gold-subtle);border-color:var(--gold)}
+.rig-toggle input:checked+.rig-toggle-slider::before{transform:translateX(24px);background:var(--gold);box-shadow:0 0 12px var(--gold-glow)}
+
+/* 
+ 5. TABS — real, switch content on click
+ */
+.rig-tabs{display:flex;gap:.25rem;border-bottom:1px solid var(--glass-border);margin-bottom:1.5rem}
+.rig-tab{
+ padding:.75rem 1.5rem;cursor:pointer;
+ font-family:var(--sans);font-weight:500;font-size:.85rem;color:var(--stone);
+ border:none;background:transparent;
+ border-bottom:2px solid transparent;transition:all .25s var(--ease);
+}
+.rig-tab:hover{color:var(--warm-white)}
+.rig-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.rig-tab-content{display:none;animation:fadeUp .4s var(--ease)}
+.rig-tab-content.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* 
+ 6. ACCORDION — real, expand/collapse
+ */
+.rig-acc-item{margin-bottom:.5rem;border-radius:10px;overflow:hidden}
+.rig-acc-header{
+ padding:1.1rem 1.4rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;
+ font-weight:500;font-size:.95rem;color:var(--warm-white);transition:all .25s;
+ user-select:none;
+}
+.rig-acc-header:hover{color:var(--gold)}
+.rig-acc-icon{font-size:1.1rem;color:var(--gold);transition:transform .3s var(--ease)}
+.rig-acc-item.open .rig-acc-icon{transform:rotate(45deg)}
+.rig-acc-body{max-height:0;overflow:hidden;transition:max-height .35s var(--ease)}
+.rig-acc-body-inner{padding:0 1.4rem 1.2rem;color:var(--stone);font-size:.88rem;line-height:1.6}
+
+/* 
+ 7. PROGRESS BAR — real, animated fill
+ */
+.rig-progress{height:8px;background:rgba(10,8,6,.6);border:1px solid var(--glass-border);border-radius:4px;overflow:hidden}
+.rig-progress-fill{height:100%;background:linear-gradient(90deg,var(--gold-dark),var(--gold),var(--gold-light));border-radius:3px;transition:width 1s var(--ease);box-shadow:0 0 10px var(--gold-glow)}
+
+/* 
+ 8. ALERT / NOTIFICATION — real, dismissible
+ */
+.rig-alert{display:flex;align-items:flex-start;gap:.75rem;padding:.85rem 1.1rem;border-radius:10px;font-size:.85rem;margin-bottom:.5rem;animation:slideIn .3s var(--ease)}
+.rig-alert-success{background:rgba(91,140,90,.1);border:1px solid rgba(91,140,90,.25);color:var(--moss)}
+.rig-alert-info{background:var(--gold-subtle);border:1px solid var(--gold-hair);color:var(--gold)}
+.rig-alert-error{background:rgba(196,69,54,.1);border:1px solid rgba(196,69,54,.25);color:var(--red)}
+.rig-alert-close{margin-left:auto;cursor:pointer;color:inherit;opacity:.5;background:none;border:none;font-size:1rem;transition:opacity .2s}
+.rig-alert-close:hover{opacity:1}
+@keyframes slideIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+
+/* 
+ 9. MODAL — real, opens/closes with backdrop
+ */
+.rig-modal-overlay{position:fixed;inset:0;background:rgba(10,8,6,.8);backdrop-filter:blur(8px);z-index:200;display:none;align-items:center;justify-content:center;padding:2rem}
+.rig-modal-overlay.show{display:flex;animation:fadeIn .3s}
+.rig-modal{max-width:480px;width:100%;padding:2rem}
+.rig-modal-close{float:right;cursor:pointer;color:var(--stone);font-size:1.3rem;background:none;border:none;transition:color .2s}
+.rig-modal-close:hover{color:var(--gold)}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* 
+ 10. BADGES / CHIPS / PILLS — real inline elements
+ */
+.rig-badge{display:inline-flex;align-items:center;gap:.3rem;padding:.2rem .6rem;border-radius:4px;font-family:var(--mono);font-size:.65rem;letter-spacing:.04em;background:var(--gold-subtle);color:var(--gold);border:1px solid var(--gold-hair)}
+.rig-chip{display:inline-flex;align-items:center;gap:.3rem;padding:.3rem .8rem;border-radius:20px;font-family:var(--mono);font-size:.72rem;background:var(--glass-bg);backdrop-filter:blur(8px);color:var(--warm-white);border:1px solid var(--glass-border);transition:all .2s}
+.rig-chip:hover{border-color:var(--gold);color:var(--gold)}
+.rig-chip-gold{background:linear-gradient(135deg,var(--gold-subtle),rgba(200,169,110,.03));border-color:var(--gold);color:var(--gold)}
+
+/* 
+ 11. TRUST BAR — real stat row
+ */
+.rig-trust{display:flex;flex-wrap:wrap;justify-content:center;gap:clamp(1.5rem,4vw,3rem);padding:2rem;border-radius:16px}
+.rig-trust-item{text-align:center}
+.rig-trust-item .num{font-family:var(--serif);font-size:clamp(1.4rem,3vw,2rem);color:var(--gold);display:block;font-weight:500}
+.rig-trust-item .label{font-family:var(--mono);font-size:.6rem;color:var(--stone);text-transform:uppercase;letter-spacing:.08em;display:block;margin-top:.2rem}
+
+/* HELPER */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+@media(max-width:700px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- BUTTONS -->
+<section class="demo-section">
+ <div class="demo-label">01 · BUTTONS</div>
+ <h2>Real <em>clickable</em> buttons</h2>
+ <div class="demo-row">
+ <button class="rig-btn rig-btn-gold rig-btn-lg" onclick="alert('Gold button clicked!')">Book Assessment →</button>
+ <button class="rig-btn rig-btn-gold">Primary</button>
+ <button class="rig-btn rig-btn-gold rig-btn-sm">Small</button>
+ </div>
+ <div class="demo-row">
+ <button class="rig-btn rig-btn-glass rig-btn-lg">Glass Large</button>
+ <button class="rig-btn rig-btn-glass">Glass</button>
+ <button class="rig-btn rig-btn-glass rig-btn-sm">Small</button>
+ </div>
+ <div class="demo-row">
+ <button class="rig-btn rig-btn-ghost">Ghost</button>
+ <button class="rig-btn rig-btn-ghost rig-btn-sm">Ghost Small</button>
+ <button class="rig-btn rig-btn-gold rig-btn-block" style="max-width:300px">Block (Full Width)</button>
+ </div>
+</section>
+
+<!-- CARDS -->
+<section class="demo-section">
+ <div class="demo-label">02 · CARDS</div>
+ <h2>Glassmorphic <em>cards</em></h2>
+ <div class="grid-4 mb-3" style="margin-bottom:1rem">
+ <div class="glass rig-card-stat"><span class="num">$32B</span><span class="label">Merger</span></div>
+ <div class="glass rig-card-stat"><span class="num">130+</span><span class="label">Agents</span></div>
+ <div class="glass rig-card-stat"><span class="num">1,147</span><span class="label">Modules</span></div>
+ <div class="glass rig-card-stat"><span class="num">159</span><span class="label">Tests</span></div>
+ </div>
+ <div class="grid-3">
+ <div class="glass rig-card rig-card-feature">
+ <div class="icon"></div>
+ <h3>Anti-Crowd Score</h3>
+ <p>26 strategies x 25 dimensions. DOMINATE / ENTER / WATCH / IGNORE.</p>
+ </div>
+ <div class="glass rig-card rig-card-feature">
+ <div class="icon"></div>
+ <h3>Contradiction Arbitrage</h3>
+ <p>138-node graph, PageRank centrality, 1,783 edges.</p>
+ </div>
+ <div class="glass rig-card rig-card-feature">
+ <div class="icon"></div>
+ <h3>Epistemic Drift</h3>
+ <p>PMI co-occurrence matrix, 43 bridge concepts, temporal velocity.</p>
+ </div>
+ </div>
+</section>
+
+<!-- FORMS -->
+<section class="demo-section">
+ <div class="demo-label">03 · FORM INPUTS</div>
+ <h2>Typeable <em>inputs</em> with golden focus</h2>
+ <div style="max-width:500px">
+ <div class="rig-field"><label>Your name <span class="req">*</span></label><input class="rig-input" type="text" placeholder="Jane Chen"></div>
+ <div class="rig-field"><label>Work email <span class="req">*</span></label><input class="rig-input" type="email" placeholder="jane@company.com"></div>
+ <div class="rig-field"><label>Industry</label><select class="rig-input rig-select"><option>Healthcare</option><option>Manufacturing</option><option>Dental / DSO</option><option>Legal</option><option>Other</option></select></div>
+ <div class="rig-field"><label>What's your AI challenge?</label><textarea class="rig-input rig-textarea" placeholder="Our AI pilot has been stuck for 3 months..."></textarea></div>
+ <button class="rig-btn rig-btn-gold rig-btn-block">Submit →</button>
+ </div>
+</section>
+
+<!-- TOGGLE -->
+<section class="demo-section">
+ <div class="demo-label">04 · TOGGLE SWITCH</div>
+ <h2>Interactive <em>toggles</em></h2>
+ <div class="demo-row">
+ <label class="rig-toggle"><input type="checkbox" checked><span class="rig-toggle-slider"></span></label>
+ <span style="font-size:.85rem;color:var(--stone)">Enable proof gates</span>
+ </div>
+ <div class="demo-row">
+ <label class="rig-toggle"><input type="checkbox"><span class="rig-toggle-slider"></span></label>
+ <span style="font-size:.85rem;color:var(--stone)">Auto-deploy on pass</span>
+ </div>
+</section>
+
+<!-- TABS -->
+<section class="demo-section">
+ <div class="demo-label">05 · TABS</div>
+ <h2>Switchable <em>tabbed</em> content</h2>
+ <div class="glass rig-card">
+ <div class="rig-tabs">
+ <button class="rig-tab active" onclick="switchTab(this,0)">Overview</button>
+ <button class="rig-tab" onclick="switchTab(this,1)">Tech Stack</button>
+ <button class="rig-tab" onclick="switchTab(this,2)">Verification</button>
+ </div>
+ <div class="rig-tab-content active"><p style="color:var(--stone);font-size:.9rem">26 strategies x 25 dimensions, 20 synergies. DOMINATE / ENTER / WATCH / IGNORE ratings.</p></div>
+ <div class="rig-tab-content"><p style="color:var(--stone);font-size:.9rem">Python 3.11+ · Pure deterministic · No LLM calls · 15K+ LOC across 26 modules.</p></div>
+ <div class="rig-tab-content"><p style="color:var(--stone);font-size:.9rem">L10 self-evolving · L8 eight-layer · OpenSpec BDD · ProofPacket sealed.</p></div>
+ </div>
+</section>
+
+<!-- ACCORDION -->
+<section class="demo-section">
+ <div class="demo-label">06 · ACCORDION / FAQ</div>
+ <h2>Expandable <em>sections</em></h2>
+ <div class="glass rig-card" style="padding:.5rem">
+ <div class="rig-acc-item" onclick="toggleAcc(this)"><div class="rig-acc-header"><span>Is this a sales call?</span><span class="rig-acc-icon">+</span></div><div class="rig-acc-body"><div class="rig-acc-body-inner">No. If I can't help, I'll tell you in the first 5 minutes.</div></div></div>
+ <div class="rig-acc-item" onclick="toggleAcc(this)"><div class="rig-acc-header"><span>What do I need to prepare?</span><span class="rig-acc-icon">+</span></div><div class="rig-acc-body"><div class="rig-acc-body-inner">Nothing. Bring your current AI challenge.</div></div></div>
+ <div class="rig-acc-item" onclick="toggleAcc(this)"><div class="rig-acc-header"><span>Why should I trust you?</span><span class="rig-acc-icon">+</span></div><div class="rig-acc-body"><div class="rig-acc-body-inner">$6B→$32B. 130+ agents. Army Counterintelligence. Every receipt public.</div></div></div>
+ </div>
+</section>
+
+<!-- PROGRESS -->
+<section class="demo-section">
+ <div class="demo-label">07 · PROGRESS BARS</div>
+ <h2>Animated <em>progress</em></h2>
+ <div style="max-width:500px;margin-bottom:.5rem"><span style="font-family:var(--mono);font-size:.7rem;color:var(--stone)">CONVERSION RATE</span><div class="rig-progress" style="margin-top:.3rem"><div class="rig-progress-fill" style="width:0" data-fill="68%"></div></div></div>
+ <div style="max-width:500px;margin-bottom:.5rem"><span style="font-family:var(--mono);font-size:.7rem;color:var(--stone)">TEST COVERAGE</span><div class="rig-progress" style="margin-top:.3rem"><div class="rig-progress-fill" style="width:0" data-fill="94%"></div></div></div>
+ <div style="max-width:500px"><span style="font-family:var(--mono);font-size:.7rem;color:var(--stone)">RAG EMBEDDING</span><div class="rig-progress" style="margin-top:.3rem"><div class="rig-progress-fill" style="width:0" data-fill="100%"></div></div></div>
+</section>
+
+<!-- ALERTS -->
+<section class="demo-section">
+ <div class="demo-label">08 · ALERTS</div>
+ <h2>Dismissible <em>notifications</em></h2>
+ <div style="max-width:500px">
+ <div class="rig-alert rig-alert-success"><span>[PASS]</span><span>All 159 test suites passing.</span><button class="rig-alert-close" onclick="this.parentElement.remove()">x</button></div>
+ <div class="rig-alert rig-alert-info"><span>[INFO]</span><span>New: Anti-Crowd Score engine deployed.</span><button class="rig-alert-close" onclick="this.parentElement.remove()">x</button></div>
+ <div class="rig-alert rig-alert-error"><span>[FAIL]</span><span>Proof gate failed: forged done detected.</span><button class="rig-alert-close" onclick="this.parentElement.remove()">x</button></div>
+ </div>
+</section>
+
+<!-- MODAL -->
+<section class="demo-section">
+ <div class="demo-label">09 · MODAL DIALOG</div>
+ <h2>Popup <em>modal</em> with backdrop blur</h2>
+ <button class="rig-btn rig-btn-gold" onclick="document.getElementById('modal').classList.add('show')">Open Modal →</button>
+</section>
+
+<!-- BADGES & CHIPS -->
+<section class="demo-section">
+ <div class="demo-label">10 · BADGES &amp; CHIPS</div>
+ <h2>Inline <em>tags</em> and pills</h2>
+ <div class="demo-row mb-3">
+ <span class="rig-badge">PASS Tests Pass</span>
+ <span class="rig-badge">MIT License</span>
+ <span class="rig-badge">v10</span>
+ <span class="rig-badge">Python 3.11+</span>
+ </div>
+ <div class="demo-row">
+ <span class="rig-chip rig-chip-gold"> Anti-Crowd</span>
+ <span class="rig-chip">Python</span>
+ <span class="rig-chip">TypeScript</span>
+ <span class="rig-chip">C++</span>
+ <span class="rig-chip">Docker</span>
+ <span class="rig-chip">K8s</span>
+ <span class="rig-chip">Postgres</span>
+ </div>
+</section>
+
+<!-- TRUST BAR -->
+<section class="demo-section">
+ <div class="demo-label">11 · TRUST BAR</div>
+ <h2>Stat <em>metrics</em> row</h2>
+ <div class="glass rig-trust">
+ <div class="rig-trust-item"><span class="num">$32B</span><span class="label">Merger</span></div>
+ <div class="rig-trust-item"><span class="num">130+</span><span class="label">Agents</span></div>
+ <div class="rig-trust-item"><span class="num">1,147</span><span class="label">Modules</span></div>
+ <div class="rig-trust-item"><span class="num">159</span><span class="label">Tests</span></div>
+ <div class="rig-trust-item"><span class="num">90d</span><span class="label">To Prod</span></div>
+ <div class="rig-trust-item"><span class="num">3h→15m</span><span class="label">ED Wait</span></div>
+ </div>
+</section>
+
+<!-- MODAL -->
+<div class="rig-modal-overlay" id="modal" onclick="if(event.target===this)this.classList.remove('show')">
+ <div class="glass rig-modal">
+ <button class="rig-modal-close" onclick="this.parentElement.parentElement.classList.remove('show')">x</button>
+ <h3 style="font-family:var(--serif);font-size:1.4rem;font-weight:500;margin-bottom:.75rem">Book your <em style="color:var(--gold);font-style:italic">free assessment</em></h3>
+ <p style="color:var(--stone);font-size:.9rem;margin-bottom:1.2rem">30 minutes. Real answers. No pitch.</p>
+ <div class="rig-field"><label>Name</label><input class="rig-input" type="text" placeholder="Your name"></div>
+ <div class="rig-field"><label>Email</label><input class="rig-input" type="email" placeholder="you@company.com"></div>
+ <button class="rig-btn rig-btn-gold rig-btn-block" onclick="alert('Booked!')">Book Now →</button>
+ </div>
+</div>
+
+<script>
+// TABS
+function switchTab(btn,idx){
+ var tabs=btn.parentElement,contents=btn.parentElement.parentElement.querySelectorAll('.rig-tab-content');
+ tabs.querySelectorAll('.rig-tab').forEach(t=>t.classList.remove('active'));
+ btn.classList.add('active');
+ contents.forEach((c,i)=>c.classList.toggle('active',i===idx));
+}
+// ACCORDION
+function toggleAcc(item){
+ var body=item.querySelector('.rig-acc-body');
+ var isOpen=item.classList.contains('open');
+ item.classList.toggle('open');
+ body.style.maxHeight=item.classList.contains('open')?body.scrollHeight+'px':'0';
+}
+// PROGRESS BARS — animate when scrolled into view
+var obs=new IntersectionObserver(function(entries){
+ entries.forEach(function(en){
+ if(en.isIntersecting){
+ en.target.style.width=en.target.dataset.fill;
+ obs.unobserve(en.target);
+ }
+ });
+},{threshold:.3});
+document.querySelectorAll('[data-fill]').forEach(function(el){obs.observe(el)});
+</script>
+</body>
+</html>
