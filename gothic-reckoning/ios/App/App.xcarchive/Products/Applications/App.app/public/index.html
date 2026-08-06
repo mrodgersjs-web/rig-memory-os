@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gothic Reckoning — a Werewolf Tale</title>
+<meta name="theme-color" content="#0d0908">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-512.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Gothic Reckoning">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Diablo PAL + SotN primary darks (per design doc, cited) */
+  --abyss: #0d0908;
+  --stone-deep: #1a1512;
+  --stone: #2b241f;
+  --stone-light: #453a31;
+  --bone: #d4c8b4;
+  --bone-dim: #a89a85;
+  --blood: #8b1a1a;
+  --blood-bright: #c92a2a;
+  --ember: #cc7a2e;
+  --ember-dim: #8a5420;
+  --arcane: #5a3d8a;
+  --gold: #b89548;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--abyss);
+  color: var(--bone);
+  font-family: 'EB Garamond', Georgia, serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+/* --- torch-lit vignette --- */
+body::before {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(ellipse 60% 45% at 15% 20%, rgba(204,122,46,0.07), transparent 60%),
+    radial-gradient(ellipse 60% 45% at 85% 80%, rgba(204,122,46,0.05), transparent 60%),
+    radial-gradient(ellipse 120% 90% at 50% 50%, transparent 30%, rgba(13,9,8,0.85) 100%);
+  animation: torchFlicker 6s infinite;
+}
+@keyframes torchFlicker {
+  0%,100% { opacity: 1; } 50% { opacity: 0.85; }
+}
+/* === TITLE === */
+.title-screen {
+  position: relative; z-index: 1;
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+}
+.gothic-title {
+  font-family: 'UnifrakturMaguntia', 'EB Garamond', cursive;
+  font-size: clamp(2.2rem, 9vw, 4.5rem);
+  font-weight: normal;
+  color: var(--bone);
+  text-shadow:
+    0 0 18px rgba(204,122,46,0.35),
+    0 4px 0 var(--stone-deep),
+    0 6px 12px rgba(0,0,0,0.9);
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+  animation: slowFadeIn 2.2s ease-out;
+}
+.title-rule {
+  width: 320px; height: 2px; margin: 22px auto;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  position: relative;
+}
+.title-rule::before, .title-rule::after {
+  content: '◆'; position: absolute; top: -9px;
+  color: var(--gold); font-size: 10px;
+}
+.title-rule::before { left: 0; }
+.title-rule::after { right: 0; }
+.subtitle {
+  font-size: 1.05rem; font-style: italic;
+  color: var(--bone-dim);
+  letter-spacing: 0.12em;
+  animation: slowFadeIn 3.4s ease-out;
+}
+.begin-btn {
+  margin-top: 64px;
+  font-family: 'EB Garamond', serif;
+  font-size: 1.15rem; letter-spacing: 0.25em; text-transform: uppercase;
+  color: var(--bone);
+  background: linear-gradient(180deg, var(--stone) 0%, var(--stone-deep) 100%);
+  border: 1px solid var(--stone-light);
+  border-top: 2px solid var(--gold);
+  padding: 18px 56px;
+  cursor: pointer;
+  position: relative; z-index: 1;
+  box-shadow: 0 4px 0 var(--abyss), 0 8px 24px rgba(0,0,0,0.6);
+  transition: all 0.4s ease; /* SLOW atmosphric per 90s convention */
+  animation: slowFadeIn 4.2s ease-out;
+}
+.begin-btn:hover {
+  border-top-color: var(--ember);
+  box-shadow: 0 4px 0 var(--abyss), 0 8px 32px rgba(204,122,46,0.25);
+  color: #fff;
+  transform: translateY(-1px);
+}
+.begin-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--abyss); }
+/* === ORNATE BORDER FRAME === */
+.frame {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  border: 24px solid transparent;
+  border-image: linear-gradient(135deg, var(--stone-light), var(--stone-deep), var(--stone-light)) 24;
+  position: relative;
+}
+.frame::before, .frame::after {
+  content: ''; position: absolute;
+  width: 48px; height: 48px;
+  background: radial-gradient(circle, var(--gold) 30%, transparent 70%);
+  opacity: 0.55;
+}
+.frame::before { top: -22px; left: -22px; }
+.frame::after { bottom: -22px; right: -22px; }
+/* === GAME LAYOUT === */
+#game { display: none; position: relative; z-index: 1; }
+.game-header {
+  padding: 18px 28px;
+  border-bottom: 1px solid var(--stone);
+  display: flex; justify-content: space-between; align-items: center;
+  background: linear-gradient(180deg, var(--stone-deep), transparent);
+}
+.phase-banner {
+  font-family: 'UnifrakturMaguntia', cursive;
+  font-size: 1.5rem; color: var(--ember);
+  text-shadow: 0 0 12px rgba(204,122,46,0.4);
+}
+.alive-count { font-size: 0.95rem; color: var(--bone-dim); font-style: italic; }
+.arena {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 0; min-height: calc(100vh - 160px);
+}
+.graveyard-seats {
+  padding: 28px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  align-content: start;
+}
+.seat {
+  background: linear-gradient(180deg, var(--stone-deep), var(--abyss));
+  border: 1px solid var(--stone);
+  border-top: 2px solid var(--stone-light);
+  padding: 14px 12px;
+  text-align: center;
+  font-size: 0.92rem;
+  cursor: pointer;
+  position: relative;
+  transition: border-color 0.5s ease, box-shadow 0.5s ease;
+}
+.seat:hover { border-color: var(--ember-dim); }
+.seat.alive { color: var(--bone); }
+.seat.dead { color: var(--stone-light); text-decoration: line-through; opacity: 0.5; }
+.seat.dead::after { content: ' †'; color: var(--blood); }
+.seat.werewolf-known { border-top-color: var(--blood); }
+.seat.selected { border-color: var(--ember); box-shadow: 0 0 14px rgba(204,122,46,0.3); }
+.seat .role-tag { display: block; font-size: 0.72rem; color: var(--bone-dim); margin-top: 6px; letter-spacing: 0.1em; }
+/* === LOG / GRIMOIRE === */
+.grimoire {
+  border-left: 1px solid var(--stone);
+  background: linear-gradient(90deg, var(--stone-deep) 0%, var(--abyss) 15%);
+  display: flex; flex-direction: column;
+}
+.grimoire-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--stone);
+  font-family: 'UnifrakturMaguntia', cursive;
+  font-size: 1.1rem; color: var(--gold);
+  letter-spacing: 0.08em;
+}
+.log {
+  flex: 1; overflow-y: auto; padding: 18px 20px;
+  font-size: 0.95rem; line-height: 1.85;
+}
+.log-entry { margin-bottom: 12px; opacity: 0; animation: slowFadeIn 1.4s ease-out forwards; }
+.log-entry.night { color: var(--arcane); }
+.log-entry.day { color: var(--bone); }
+.log-entry.blood { color: var(--blood-bright); }
+.log-entry.vote { color: var(--ember); }
+.log-entry.system { color: var(--bone-dim); font-style: italic; }
+.log::-webkit-scrollbar { width: 8px; }
+.log::-webkit-scrollbar-track { background: var(--abyss); }
+.log::-webkit-scrollbar-thumb { background: var(--stone); border: 2px solid var(--abyss); }
+/* === ACTIONS BAR === */
+.actions {
+  padding: 18px 28px;
+  border-top: 1px solid var(--stone);
+  display: flex; gap: 12px; flex-wrap: wrap;
+  background: linear-gradient(0deg, var(--stone-deep), transparent);
+}
+.action-btn {
+  font-family: 'EB Garamond', serif;
+  font-size: 0.95rem; letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--bone-dim);
+  background: var(--stone-deep);
+  border: 1px solid var(--stone);
+  padding: 11px 26px; cursor: pointer;
+  transition: all 0.4s ease;
+}
+.action-btn:hover:not(:disabled) { color: var(--bone); border-color: var(--ember-dim); }
+.action-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.action-btn.primary {
+  color: var(--bone); border-color: var(--gold);
+  background: linear-gradient(180deg, var(--stone) 0%, var(--stone-deep) 100%);
+}
+/* === SLOW FADES (90s atmosphric convention per design doc) === */
+@keyframes slowFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+/* === END OVERLAY === */
+.end-overlay {
+  display: none;
+  position: fixed; inset: 0; z-index: 10;
+  background: rgba(13,9,8,0.94);
+  align-items: center; justify-content: center;
+  text-align: center; padding: 40px;
+}
+.end-overlay.show { display: flex; animation: slowFadeIn 2.8s ease-out; }
+.end-title {
+  font-family: 'UnifrakturMaguntia', cursive;
+  font-size: clamp(2rem, 7vw, 3.6rem);
+  color: var(--bone);
+}
+.end-title.village { color: var(--gold); }
+.end-title.wolves { color: var(--blood-bright); text-shadow: 0 0 24px rgba(201,42,42,0.5); }
+.reason-btn { color: var(--bone-dim); font-style: italic; text-decoration: underline; cursor: pointer; font-size: 0.9rem; }
+.reason-btn:hover { color: var(--bone); }
+/* Mobile */
+@media (max-width: 860px) {
+  .arena { grid-template-columns: 1fr; }
+  .grimoire { border-left: none; border-top: 1px solid var(--stone); max-height: 40vh; }
+  .graveyard-seats { grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 18px; }
+  .gothic-title { font-size: clamp(1.8rem, 11vw, 3rem); }
+}
+/* CRT scanline subtle — 90s monitor feel */
+body::after {
+  content: '';
+  position: fixed; inset: 0; z-index: 2; pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,0.06) 0px, transparent 1px, transparent 3px);
+  opacity: 0.4;
+}
+</style>
+</head>
+<body>
+
+<!-- ==================== TITLE ==================== -->
+<section id="title" class="title-screen">
+  <div style="font-size:3rem; margin-bottom:20px; animation: slowFadeIn 1.8s ease-out">🐺</div>
+  <h1 class="gothic-title">Gothic Reckoning</h1>
+  <div class="title-rule"></div>
+  <p class="subtitle">a werewolf tale in twelve souls</p>
+  <button class="begin-btn" id="beginBtn" onclick="startGame()">Begin the Night</button>
+  <p style="margin-top:48px; font-size:0.85rem; color:var(--stone-light); font-style:italic; animation: slowFadeIn 4.6s ease-out;">
+    12 souls. 4 wolves. 3 nights of suspicion.<br>
+    <span class="reason-btn" onclick="showReason()">…what is this?</span>
+  </p>
+</section>
+
+<!-- ==================== GAME ==================== -->
+<section id="game" class="frame">
+  <div class="game-header">
+    <div class="phase-banner" id="phaseBanner">Night</div>
+    <div class="alive-count" id="aliveCount">12 souls remain</div>
+  </div>
+  <div class="arena">
+    <div class="graveyard-seats" id="seats"></div>
+    <aside class="grimoire">
+      <div class="grimoire-header">The Record</div>
+      <div class="log" id="log"></div>
+    </aside>
+  </div>
+  <div class="actions" id="actionBar">
+    <button class="action-btn primary" id="advanceBtn" onclick="advancePhase()">Continue</button>
+    <button class="action-btn" onclick="showStats()">Tally</button>
+    <button class="action-btn" onclick="newGame()">New Tale</button>
+  </div>
+</section>
+
+<!-- ==================== END ==================== -->
+<div id="endOverlay" class="end-overlay">
+  <div>
+    <div class="end-title" id="endTitle"></div>
+    <div class="title-rule"></div>
+    <p class="subtitle" id="endSubtitle"></p>
+    <button class="begin-btn" onclick="newGame()" style="margin-top:40px;">Another Tale</button>
+  </div>
+</div>
+
+<script src="game.js"></script>
+<script>
+// Game orchestration — talks to gothic engine via JSON state.
+let G = null;           // game state from engine
+let selected = null;    // selected player for actions
+let phase = 'NIGHT';
+let nightActions = { seer: null, witch: null, guard: null };
+
+const $ = id => document.getElementById(id);
+const log = (msg, cls='day') => {
+  const el = document.createElement('div');
+  el.className = `log-entry ${cls}`;
+  el.innerHTML = msg;
+  $('log').appendChild(el);
+  $('log').scrollTop = $('log').scrollHeight;
+};
+
+async function startGame() {
+  $('title').style.display = 'none';
+  $('game').style.display = 'block';
+  await newGame();
+}
+
+async function newGame() {
+  $('endOverlay').classList.remove('show');
+  const names = Array.from({length: 12}, (_, i) => `Soul ${i+1}`);
+  const res = await fetch('/api/game/new', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({players: names, seed: Math.floor(Math.random()*99999)})
+  });
+  G = (await res.json()).game;
+  phase = 'NIGHT';
+  nightActions = { seer: null, witch: null, guard: null };
+  selected = null;
+  render();
+  log('The village gathers. Twelve souls, four wolves among them.', 'system');
+  log(`Night falls on <em>${G.players.filter(p=>p.role==='WEREWOLF').length} hidden wolves</em>. Choose who to watch, who to bless.`, 'night');
+}
+
+function render() {
+  if (!G) return;
+  $('phaseBanner').textContent = phaseName();
+  const alive = G.players.filter(p => p.alive).length;
+  $('aliveCount').textContent = `${alive} soul${alive === 1 ? '' : 's'} remain`;
+  // seats
+  const seats = $('seats');
+  seats.innerHTML = '';
+  G.players.forEach((p, i) => {
+    const div = document.createElement('div');
+    div.className = `seat ${p.alive ? 'alive' : 'dead'}${selected === i ? ' selected' : ''}`;
+    if (p.knownWolf) div.classList.add('werewolf-known');
+    div.innerHTML = `${p.name}<span class="role-tag">${p.alive ? roleIcon(p.role) : ''}</span>`;
+    div.onclick = () => p.alive && selectSeat(i);
+    seats.appendChild(div);
+  });
+  // advance button label
+  $('advanceBtn').textContent = advanceLabel();
+}
+
+function selectSeat(i) {
+  selected = selected === i ? null : i;
+  // night actions on selection
+  const p = G.players[i];
+  log(`You consider <strong>${p.name}</strong>…`, 'system');
+  render();
+}
+
+function roleIcon(role) {
+  return { SEER: '👁 Seer', WITCH: '🌿 Witch', HUNTER: '🏹 Hunter', GUARD: '🛡 Guard', WEREWOLF: '🐺 Wolf', VILLAGER: '🌾 Soul' }[role] || '—';
+}
+
+function phaseName() {
+  const n = Math.ceil(G.night_count/2 + 1);
+  return { NIGHT: `Night ${n}`, DAY: `Day ${n}`, VOTE: `Judgment ${n}`, DUSK: `Dusk ${n}` }[phase] || phase;
+}
+
+function advanceLabel() {
+  return { NIGHT: 'Let Night Pass', DAY: 'Hear the Village', VOTE: 'Cast Judgment', DUSK: 'To Sleep' }[phase] || 'Continue';
+}
+
+async function advancePhase() {
+  const res = await fetch('/api/game/advance', {method: 'POST'});
+  const next = await res.json();
+  const prevPhase = phase;
+  G = next.game;
+  phase = next.phase;
+
+  if (phase === 'DAY' && prevPhase === 'NIGHT') {
+    const dead = next.night_victim;
+    if (dead) log(`<strong>${dead.name}</strong> was found at dawn. ${roleIcon(dead.role)} no more.`, 'blood');
+    else log('Dawn breaks. No bell tolls this morning.', 'day');
+    log('The village gathers to speak. Who do you suspect?', 'day');
+  }
+  if (phase === 'VOTE' && prevPhase === 'DAY') {
+    log('The hall quiets. Each soul must name one to cast out.', 'vote');
+  }
+  if (next.lynched) {
+    log(`The village speaks as one: <strong>${next.lynched.name}</strong> is taken to the pyre. ${roleIcon(next.lynched.role)} revealed!`, 'blood');
+    phase = 'DUSK';
+  }
+  if (next.winner) {
+    endGame(next.winner);
+  }
+  render();
+}
+
+function endGame(winner) {
+  const overlay = $('endOverlay');
+  const t = $('endTitle');
+  t.textContent = winner === 'VILLAGE' ? 'The Village Endures' : 'The Wolves Feasts';
+  t.className = `end-title ${winner === 'VILLAGE' ? 'village' : 'wolves'}`;
+  $('endSubtitle').textContent = winner === 'VILLAGE'
+    ? 'The last pyre burns. The wolves are gone.'
+    : 'Night belongs to them now. The reckoning is complete.';
+  log(winner === 'VILLAGE' ? 'VICTORY — the village endures!' : 'DEFEAT — the wolves claim all.', winner === 'VILLAGE' ? 'day' : 'blood');
+  setTimeout(() => overlay.classList.add('show'), 1400);
+}
+
+function showStats() {
+  const alive = G.players.filter(p => p.alive).length;
+  const dead = G.players.length - alive;
+  log(`Tally: ${alive} breathing, ${dead} at rest. Night ${G.night_count} passes.`, 'system');
+}
+function showReason() {
+  alert('Gothic Reckoning is a social-deduction tale: hidden wolves among villagers. Watch, vote, survive — or feast.');
+}
+</script>
+</body>
+</html>

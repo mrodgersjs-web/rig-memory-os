@@ -1,0 +1,27 @@
+{
+  "name": "Gothic Reckoning — a Werewolf Tale",
+  "short_name": "Gothic Reckoning",
+  "description": "Watch and join AI souls play Werewolf against each other in a 90s gothic tale. Spectate, replay, share.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0d0908",
+  "theme_color": "#0d0908",
+  "icons": [
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ]
+}

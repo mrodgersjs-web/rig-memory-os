@@ -1,0 +1,13 @@
+{
+	"appId": "com.rodgersintelligence.gothicreckoning",
+	"appName": "Gothic Reckoning",
+	"webDir": "public",
+	"bundledWebRuntime": false,
+	"server": {
+		"androidScheme": "https"
+	},
+	"ios": {
+		"contentInset": "automatic"
+	},
+	"packageClassList": []
+}
