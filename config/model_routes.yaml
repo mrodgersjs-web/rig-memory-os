@@ -1,0 +1,41 @@
+# Model routes and cost ceiling (handoff §12).
+# Local-first; cloud only when local cannot pass acceptance.
+
+default_route_order:
+  - deterministic_code
+  - local_node_model
+  - larger_local_route_256gb_or_blackwell
+  - cloud_model_only_when_required
+
+model_routes:
+
+  hermes-default:
+    type: local_router
+    surfaces: [rig-128gb-local, rig-36gb-lan, rig-48gb-lan, rig-96gb-lan, rig-256gb-lan]
+    preferred_first: rig-256gb-lan
+
+  blackwell-vllm:
+    type: local_vllm
+    api: openai_compatible
+    base_url: http://100.91.39.18:8000/v1    # placeholder; replace at activation
+    notes: OpenAI-compatible vLLM. NOT an Ollama endpoint.
+
+  gbrain-context:
+    type: local_rag
+    surfaces: [openviking, gbrain]
+    role: read_only_evidence_layer
+
+cloud_escalation:
+  requires_evidence: true
+  requires_mike_approval: false          # Mike has already approved in policy
+  max_cost_per_mission_usd: 5.00
+  max_cost_per_day_usd: 50.00
+  no_auto_reload: true
+  no_autonomous_purchase: true
+
+escalation_record:
+  fields: [work_item_id, local_attempts, reason_local_failed,
+           provider, model, max_cost_usd, approved_budget_policy, result_quality]
+  storage: audit_log
+
+blocked_when_cloud_unavailable: BLOCKED_CAPACITY   # not "buy more"

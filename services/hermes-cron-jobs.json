@@ -1,0 +1,47 @@
+[
+  {
+    "name": "rig-founder-dispatch-tick",
+    "schedule": "every_minute",
+    "agentic": false,
+    "command": "cd /Users/rig128gb/Developer/rig-intelligence/platform/founder-runtime && /Users/rig128gb/Developer/rig-intelligence/platform/founder-runtime/.venv/bin/founder-runtime dispatch-tick",
+    "deliver": "local",
+    "enabled": true,
+    "description": "Recover leases, lease eligible work, push priority aging."
+  },
+  {
+    "name": "rig-founder-hourly-review",
+    "schedule": "every_hour",
+    "agentic": true,
+    "command": "cd /Users/rig128gb/Developer/rig-intelligence/platform/founder-runtime && /Users/rig128gb/Developer/rig-intelligence/platform/founder-runtime/.venv/bin/founder-runtime founder-review",
+    "deliver": "local",
+    "enabled": true,
+    "description": "Up to three portfolio changes per review."
+  },
+  {
+    "name": "rig-morning-founder-brief",
+    "schedule": "daily_0630_local",
+    "agentic": true,
+    "command": "cd /Users/rig128gb/Developer/rig-intelligence/platform/founder-runtime && /Users/rig128gb/Developer/rig-intelligence/platform/founder-runtime/.venv/bin/founder-runtime morning-brief",
+    "deliver": "local",
+    "enabled": true,
+    "description": "Decision-dense morning brief."
+  },
+  {
+    "name": "rig-node-health-review",
+    "schedule": "every_5_minutes",
+    "agentic": false,
+    "command": "cd /Users/rig128gb/Developer/rig-intelligence/platform/founder-runtime && /Users/rig128gb/Developer/rig-intelligence/platform/founder-runtime/.venv/bin/founder-runtime list-nodes",
+    "deliver": "local",
+    "enabled": true,
+    "description": "Node health snapshot."
+  },
+  {
+    "name": "rig-backup-state",
+    "schedule": "daily",
+    "agentic": false,
+    "command": "cp /Users/rig128gb/.rig/founder-runtime/state.db /tmp/qnap/rig-backups/state-$(date +%Y%m%d).db",
+    "deliver": "local",
+    "enabled": true,
+    "description": "Database backup to QNAP SMB mount."
+  }
+]

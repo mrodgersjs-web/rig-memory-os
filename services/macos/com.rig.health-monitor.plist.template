@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  launchd service for the RIG Founder Runtime health monitor.
+
+  One per control plane. Probes fleet reachability + pumps the dispatcher
+  on a fixed cadence so the queue stays drained and node registry truth
+  stays fresh.
+
+  Install:
+    cp services/macos/com.rig.health-monitor.plist.template \
+       ~/Library/LaunchAgents/com.rig.health-monitor.plist
+    launchctl load -w ~/Library/LaunchAgents/com.rig.health-monitor.plist
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.rig.health-monitor</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>__RUNTIME_DIR__/.venv/bin/founder-runtime-monitor</string>
+        <string>--interval</string>
+        <string>60</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>__RUNTIME_DIR__</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>__RUNTIME_DIR__/.venv/bin:/Users/rig128gb/.local/bin:/usr/local/bin:/usr/bin:/bin</string>
+        <key>PYTHONUNBUFFERED</key>
+        <string>1</string>
+    </dict>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <dict>
+        <key>SuccessfulExit</key>
+        <false/>
+        <key>Crashed</key>
+        <true/>
+    </dict>
+
+    <key>ThrottleInterval</key>
+    <integer>10</integer>
+
+    <key>StandardOutPath</key>
+    <string>__LOG_DIR__/health-monitor.out.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>__LOG_DIR__/health-monitor.err.log</string>
+
+    <key>ProcessType</key>
+    <string>Background</string>
+</dict>
+</plist>

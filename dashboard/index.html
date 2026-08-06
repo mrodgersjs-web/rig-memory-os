@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>RIG Founder Console</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root {
+      --bg: #0b0f17; --panel: #131826; --panel-2: #1a2034; --ink: #e6edf3;
+      --ink-dim: #8b95a7; --accent: #d4a04a; --green: #4ade80; --red: #f87171;
+      --amber: #fbbf24; --line: #232a3d;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); font: 14px/1.5 -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif; }
+    header { padding: 16px 24px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; }
+    header h1 { margin: 0; font-size: 16px; font-weight: 600; letter-spacing: 0.3px; }
+    header h1 .accent { color: var(--accent); }
+    header .ts { color: var(--ink-dim); font-size: 12px; }
+    main { display: grid; grid-template-columns: 220px 1fr; min-height: calc(100vh - 53px); }
+    nav { background: var(--panel); border-right: 1px solid var(--line); padding: 12px 0; }
+    nav button { display: block; width: 100%; padding: 10px 18px; background: none; border: 0; color: var(--ink-dim); text-align: left; cursor: pointer; font: inherit; }
+    nav button:hover, nav button.active { color: var(--ink); background: var(--panel-2); border-left: 2px solid var(--accent); padding-left: 16px; }
+    .view { padding: 24px 32px; overflow-y: auto; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    .card { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 16px 18px; }
+    .card h2 { margin: 0 0 10px 0; font-size: 13px; font-weight: 600; color: var(--accent); letter-spacing: 0.5px; text-transform: uppercase; }
+    .stat { font-size: 24px; font-weight: 600; }
+    .stat .label { display: block; font-size: 11px; color: var(--ink-dim); font-weight: 400; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .pill { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; letter-spacing: 0.3px; }
+    .pill.ready { background: rgba(74, 222, 128, 0.15); color: var(--green); }
+    .pill.leased { background: rgba(212, 160, 74, 0.15); color: var(--accent); }
+    .pill.completed { background: rgba(139, 149, 167, 0.15); color: var(--ink-dim); }
+    .pill.failed, .pill.dead-lettered { background: rgba(248, 113, 113, 0.15); color: var(--red); }
+    .pill.reopened { background: rgba(251, 191, 36, 0.15); color: var(--amber); }
+    .pill.online { background: rgba(74, 222, 128, 0.15); color: var(--green); }
+    .pill.offline, .pill.offline_unverified { background: rgba(248, 113, 113, 0.15); color: var(--red); }
+    .pill.draining { background: rgba(251, 191, 36, 0.15); color: var(--amber); }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); font-size: 13px; }
+    th { color: var(--ink-dim); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .empty { color: var(--ink-dim); font-style: italic; padding: 12px 0; }
+    .row-actions { display: flex; gap: 6px; }
+    .btn { background: var(--panel-2); color: var(--ink); border: 1px solid var(--line); padding: 4px 10px; border-radius: 4px; cursor: pointer; font: inherit; font-size: 12px; }
+    .btn:hover { border-color: var(--accent); }
+    .btn.danger { color: var(--red); border-color: rgba(248, 113, 113, 0.4); }
+    .health-bar { height: 4px; background: var(--panel-2); border-radius: 2px; overflow: hidden; }
+    .health-bar > div { height: 100%; background: var(--green); transition: width 0.3s; }
+    .footer { color: var(--ink-dim); font-size: 11px; padding: 12px 24px; border-top: 1px solid var(--line); }
+    .footer code { background: var(--panel-2); padding: 2px 6px; border-radius: 3px; color: var(--accent); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>RIG <span class="accent">Founder Console</span></h1>
+    <div class="ts" id="header-ts">connecting…</div>
+  </header>
+
+  <main>
+    <nav id="nav">
+      <button data-view="today" class="active">Today</button>
+      <button data-view="portfolio">Opportunity portfolio</button>
+      <button data-view="fleet">Fleet</button>
+      <button data-view="queue">Work queue</button>
+      <button data-view="failures">Failures</button>
+      <button data-view="evidence">Evidence</button>
+      <button data-view="learning">Learning</button>
+    </nav>
+    <section class="view" id="view">Loading…</section>
+  </main>
+
+  <div class="footer">
+    API: <code>POST /api/today</code> · <code>POST /api/portfolio</code> · <code>POST /api/fleet</code> · <code>POST /api/queue</code>
+    · Data refreshes every 30s · Read-only on the runtime database
+  </div>
+
+  <script>
+    const VIEWS = {
+      today: renderToday,
+      portfolio: renderPortfolio,
+      fleet: renderFleet,
+      queue: renderQueue,
+      failures: renderFailures,
+      evidence: renderEvidence,
+      learning: renderLearning,
+    };
+
+    let cache = {};
+
+    async function fetchAll() {
+      const endpoints = ['today', 'portfolio', 'fleet', 'nodes', 'queue', 'queue_health', 'failures', 'evidence', 'learning'];
+      const out = {};
+      for (const e of endpoints) {
+        try {
+          const r = await fetch(`/api/${e}`);
+          out[e] = r.ok ? await r.json() : { error: `${r.status}` };
+        } catch (err) {
+          out[e] = { error: String(err) };
+        }
+      }
+      return out;
+    }
+
+    async function refresh() {
+      cache = await fetchAll();
+      document.getElementById('header-ts').textContent = new Date().toISOString();
+      const active = document.querySelector('nav button.active').dataset.view;
+      document.getElementById('view').innerHTML = VIEWS[active](cache[active]);
+    }
+
+    function esc(s) {
+      const d = document.createElement('div');
+      d.textContent = s == null ? '' : String(s);
+      return d.innerHTML;
+    }
+
+    function pill(status) {
+      const cls = String(status).toLowerCase().replace(/_/g, '_');
+      return `<span class="pill ${cls}">${esc(status)}</span>`;
+    }
+
+    function renderToday(d) {
+      if (!d || d.error) return `<div class="empty">API not reachable. Start the runtime:</div><pre>uv run python -m founder_runtime.cli api</pre>`;
+      const focus = (d.focus || []).slice(0, 3);
+      const brief = d.brief || '';
+      const approvals = d.pending_approvals || [];
+      return `
+        <div class="grid-3">
+          ${focus.map((o, i) => `
+            <div class="card">
+              <h2>Priority ${i + 1}</h2>
+              <div style="font-weight:600;margin-bottom:6px">${esc(o.title)}</div>
+              <div style="color:var(--ink-dim);font-size:12px">${esc(o.stage)} · conf=${esc(o.confidence ?? '—')}</div>
+              ${o.next_action ? `<div style="margin-top:8px">${esc(o.next_action)}</div>` : ''}
+            </div>`).join('')}
+        </div>
+        <div class="grid-2" style="margin-top:16px">
+          <div class="card">
+            <h2>Pending Mike approvals</h2>
+            ${approvals.length === 0 ? '<div class="empty">none waiting</div>' : approvals.map(a => `
+              <div style="padding:8px 0;border-bottom:1px solid var(--line)">
+                <strong>${esc(a.action_type)}</strong> → ${esc(a.target)}
+                <div style="color:var(--ink-dim);font-size:12px">${esc(a.business_reason)}</div>
+              </div>`).join('')}
+          </div>
+          <div class="card">
+            <h2>Morning brief</h2>
+            <pre style="margin:0;white-space:pre-wrap;font-family:inherit">${esc(brief)}</pre>
+          </div>
+        </div>`;
+    }
+
+    function renderPortfolio(d) {
+      if (!d || d.error) return `<div class="empty">API not reachable.</div>`;
+      const rows = d.opportunities || [];
+      if (!rows.length) return '<div class="empty">No opportunities tracked yet.</div>';
+      return `
+        <div class="card">
+          <h2>Opportunities</h2>
+          <table>
+            <thead><tr><th>Stage</th><th>Title</th><th>Direction</th><th>Pain</th><th>Urgency</th><th>Buyer</th><th>Proof</th><th>Conf</th><th>Next action</th></tr></thead>
+            <tbody>${rows.map(o => `
+              <tr>
+                <td>${pill(o.stage)}</td>
+                <td>${esc(o.title)}</td>
+                <td>${esc(o.direction_fit ?? '—')}</td>
+                <td>${esc(o.pain_evidence ?? '—')}</td>
+                <td>${esc(o.urgency_evidence ?? '—')}</td>
+                <td>${esc(o.buyer_access ?? '—')}</td>
+                <td>${esc(o.proof_advantage ?? '—')}</td>
+                <td>${esc(o.confidence ?? '—')}</td>
+                <td>${esc(o.next_action ?? '')}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>`;
+    }
+
+    function renderFleet(d) {
+      if (!d || d.error) return `<div class="empty">API not reachable.</div>`;
+      const rows = d.nodes || [];
+      return `
+        <div class="card">
+          <h2>Fleet</h2>
+          ${rows.length === 0 ? '<div class="empty">No nodes registered.</div>' : `
+          <table>
+            <thead><tr><th>Node</th><th>Status</th><th>Load</th><th>Heartbeat</th><th>Capabilities</th><th>Actions</th></tr></thead>
+            <tbody>${rows.map(n => `
+              <tr>
+                <td><strong>${esc(n.node_id)}</strong><div style="color:var(--ink-dim);font-size:11px">${esc(n.hostname)}</div></td>
+                <td>${pill(n.status)}</td>
+                <td>${n.current_load} / ${n.max_concurrency}
+                  <div class="health-bar"><div style="width:${(n.current_load / n.max_concurrency * 100).toFixed(0)}%"></div></div>
+                </td>
+                <td style="font-size:11px;color:var(--ink-dim)">${esc(n.last_heartbeat || 'never')}</td>
+                <td style="font-size:11px;color:var(--ink-dim)">${esc((n.capabilities || []).join(', '))}</td>
+                <td class="row-actions">
+                  <button class="btn">Drain</button>
+                </td>
+              </tr>`).join('')}
+            </tbody>
+          </table>`}
+        </div>`;
+    }
+
+    function renderQueue(d) {
+      if (!d || d.error) return `<div class="empty">API not reachable.</div>`;
+      const counts = d.counts || {};
+      const cards = ['READY', 'LEASED', 'COMPLETED', 'FAILED', 'REOPENED', 'DEAD_LETTERED']
+        .map(s => `<div class="card"><span class="label">${s}</span><span class="stat">${esc(counts[s] || 0)}</span></div>`).join('');
+      const stale = (d.stale_leases_now || 0) > 0
+        ? `<span class="pill failed">${d.stale_leases_now} stale</span>`
+        : `<span class="pill online">0 stale</span>`;
+      return `
+        <div class="grid-3">${cards}</div>
+        <div class="grid-2" style="margin-top:16px">
+          <div class="card">
+            <h2>Lease recovery</h2>
+            <div style="display:flex;gap:12px;align-items:center;margin-top:6px">
+              <span class="stat">${esc(d.expired_leases_recovered_24h || 0)}</span>
+              <span style="color:var(--ink-dim);font-size:12px">recovered in last 24h</span>
+              ${stale}
+            </div>
+          </div>
+          <div class="card">
+            <h2>Recent items</h2>
+            ${(d.recent || []).length === 0 ? '<div class="empty">No recent activity.</div>' : `
+            <table>
+              <thead><tr><th>Status</th><th>Type</th><th>Objective</th><th>Priority</th><th>Lease</th></tr></thead>
+              <tbody>${d.recent.map(w => `
+                <tr>
+                  <td>${pill(w.status)}</td>
+                  <td>${esc(w.work_type)}</td>
+                  <td>${esc(w.objective)}</td>
+                  <td>${esc(w.priority)}</td>
+                  <td style="font-size:11px;color:var(--ink-dim)">${esc(w.lease_owner || '—')}</td>
+                </tr>`).join('')}
+              </tbody>
+            </table>`}
+          </div>
+        </div>`;
+    }
+
+    function renderEvidence(d) {
+      if (!d || d.error) return `<div class="empty">API not reachable.</div>`;
+      const pps = d.proofs || [];
+      return `
+        <div class="card">
+          <h2>ProofPackets</h2>
+          ${pps.length === 0 ? '<div class="empty">No proofs sealed yet.</div>' : `
+          <table>
+            <thead><tr><th>Verdict</th><th>Work item</th><th>Verifier</th><th>Model</th><th>Hash</th><th>Sealed</th></tr></thead>
+            <tbody>${pps.map(p => `
+              <tr>
+                <td>${pill(p.verdict)}</td>
+                <td style="font-size:11px">${esc(p.work_item_id || '—')}</td>
+                <td>${esc(p.verifier_node)}</td>
+                <td style="font-size:11px">${esc(p.verifier_model)}</td>
+                <td style="font-size:11px;color:var(--ink-dim)">${esc((p.evidence_hash || '').slice(0, 16))}…</td>
+                <td style="font-size:11px;color:var(--ink-dim)">${esc(p.sealed_at)}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>`}
+        </div>`;
+    }
+
+    function renderFailures(d) {
+      if (!d || d.error) return `<div class="empty">API not reachable.</div>`;
+      const summary = d.summary || {};
+      const failures = d.failures || [];
+      const cards = [
+        { label: "Failed", value: summary.failed || 0 },
+        { label: "Dead-lettered", value: summary.dead_lettered || 0 },
+      ].map(s => `<div class="card"><span class="label">${s.label}</span><span class="stat">${esc(s.value)}</span></div>`).join('');
+      const ecRows = Object.entries(summary.by_error_class || {})
+        .map(([ec, n]) => `<tr><td>${esc(ec)}</td><td>${esc(n)}</td></tr>`).join('');
+      return `
+        <div class="grid-2">${cards}</div>
+        <div class="card" style="margin-top:16px">
+          <h2>By error class</h2>
+          ${ecRows ? `<table><thead><tr><th>Error class</th><th>Count</th></tr></thead><tbody>${ecRows}</tbody></table>` : '<div class="empty">No failures.</div>'}
+        </div>
+        <div class="card" style="margin-top:16px">
+          <h2>Recent failures + dead-letters</h2>
+          ${failures.length === 0 ? '<div class="empty">Queue is healthy.</div>' : `
+          <table>
+            <thead><tr><th>When</th><th>Status</th><th>Type</th><th>Error</th><th>Worker</th><th>Attempts</th><th>Summary</th></tr></thead>
+            <tbody>${failures.map(f => `
+              <tr>
+                <td style="font-size:11px;color:var(--ink-dim)">${esc(f.completed_at || '—')}</td>
+                <td>${pill(f.status)}</td>
+                <td>${esc(f.work_type || '—')}</td>
+                <td>${esc(f.error_class || '—')}</td>
+                <td style="font-size:11px">${esc(f.worker_id || '—')}</td>
+                <td>${esc(f.attempt_count || '—')}/${esc(f.max_attempts || '—')}</td>
+                <td>${esc(f.summary || '')}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>`}
+        </div>`;
+    }
+
+    function renderLearning(d) {
+      if (!d || d.error) return `<div class="empty">API not reachable.</div>`;
+      const items = d.audit || [];
+      return `
+        <div class="card">
+          <h2>Recent audit log</h2>
+          ${items.length === 0 ? '<div class="empty">No activity yet.</div>' : `
+          <table>
+            <thead><tr><th>Time</th><th>Actor</th><th>Action</th><th>Target</th></tr></thead>
+            <tbody>${items.map(a => `
+              <tr>
+                <td style="font-size:11px;color:var(--ink-dim)">${esc(a.created_at)}</td>
+                <td>${esc(a.actor)}</td>
+                <td>${esc(a.action)}</td>
+                <td style="font-size:11px">${esc(a.target || '—')}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>`}
+        </div>`;
+    }
+
+    document.getElementById('nav').addEventListener('click', e => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const view = btn.dataset.view;
+      document.getElementById('view').innerHTML = VIEWS[view](cache[view]);
+    });
+
+    refresh();
+    setInterval(refresh, 30000);
+  </script>
+</body>
+</html>

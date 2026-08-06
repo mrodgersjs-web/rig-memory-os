@@ -1,0 +1,42 @@
+# Approval lanes (handoff §13).
+# Lane A — autonomous company work.
+# Lane B — Mike decision queue.
+
+lanes:
+
+  autonomous_local:
+    description: "Fleet may perform without human approval."
+    allowed_work_types:
+      - signal_research
+      - opportunity_validation
+      - landing_build
+      - experiment_design
+      - market_map_refresh
+      - knowledge_cleanup
+      - strategy_packet
+
+  mike_approval:
+    description: "Mike signs off before execution."
+    allowed_actions:
+      - send_email
+      - send_dm
+      - publish_post
+      - publish_comment
+      - launch_paid_ad
+      - change_pricing
+      - change_live_billing
+      - commit_client_promise
+      - push
+      - merge
+      - deploy
+      - dns_change
+      - public_exposure
+      - credential_rotation
+      - destructive_cleanup
+      - private_data_export
+    timeout_minutes: 1440              # 24h before EXPIRED
+
+state_machine:
+  pending_to: [approved, rejected, expired]
+  only_mike_can_resolve: true
+  recorded_in: approval_requests

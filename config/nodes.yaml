@@ -1,0 +1,132 @@
+# RIG node registry — verified 2026-07-27.
+# Read by `founder-runtime register-nodes --config config/nodes.yaml`.
+#
+# Status reflects the actual reachability snapshot at handoff time.
+# Use `founder-runtime fleet-status --probe` to refresh.
+
+nodes:
+
+  # Control plane — runs on THIS Mac Studio (RIG128GBs-MacBook-Pro.local, 128GB).
+  # Hosts the dispatcher, verifier, and founder review loop.
+  - node_id: rig-control-128gb
+    hostname: RIG128GBs-MacBook-Pro.local
+    status: ONLINE
+    capabilities:
+      - dispatch
+      - verifier
+      - founder_review
+      - morning_brief
+      - signal_research
+      - web_scrape
+    model_routes:
+      - hermes-default
+      - gbrain-context
+    max_concurrency: 2
+    lan_address: 192.168.68.51
+    tailnet_address: 100.77.193.77          # rig-128gb-mbp
+    worker_version: 0.1.0
+
+  # 36GB lane — RIG-36GB-Mac-Studio-2754 (Tailscale 100.89.143.27).
+  # Continuous market sensing, signal research, source capture.
+  - node_id: rig-36gb
+    hostname: rig-36gb-mac-studio-2754.tail.ts.net
+    status: OFFLINE_UNVERIFIED            # SSH inbound not yet enabled (verify with fleet probe)
+    capabilities:
+      - signal_research
+      - web_scrape
+      - lead_enrichment
+      - vertical_research
+    model_routes:
+      - hermes-default
+    max_concurrency: 2
+    tailnet_address: 100.89.143.27
+    worker_version: 0.1.0
+
+  # 48GB lane — rig-48gb-mbp (Tailscale 100.76.209.22, OFFLINE per tailscale status).
+  # GTM and implementation: offers, audits, builds.
+  - node_id: rig-48gb
+    hostname: rig-48gb-mbp.tail.ts.net
+    status: OFFLINE                       # tailscale reports "offline, last seen 12m ago"
+    capabilities:
+      - offer_draft
+      - audit_build
+      - landing_build
+      - gtm_research
+    model_routes:
+      - hermes-default
+    max_concurrency: 2
+    tailnet_address: 100.76.209.22
+    worker_version: 0.1.0
+    notes: tailscale_offline
+
+  # 96GB lane — RIG-96GB-Mac-Studio-2327 (Tailscale 100.102.142.84).
+  # Synthesis, creative QA, UX review.
+  - node_id: rig-96gb
+    hostname: rig-96gb-mac-studio-2327.tail.ts.net
+    status: OFFLINE_UNVERIFIED            # SSH inbound not yet enabled
+    capabilities:
+      - synthesis
+      - creative_qa
+      - ux_review
+      - brand_check
+    model_routes:
+      - hermes-default
+    max_concurrency: 2
+    tailnet_address: 100.102.142.84
+    worker_version: 0.1.0
+
+  # 256GB lane — RIG-256GB-Mac-Studio (Tailscale 100.91.39.12, ACTIVE).
+  # Strategy, data, decision packets.
+  - node_id: rig-256gb
+    hostname: rig-256gb-mac-studio.tail.ts.net
+    status: OFFLINE_UNVERIFIED            # SSH inbound not yet enabled
+    capabilities:
+      - strategy
+      - data_analysis
+      - decision_packet
+      - long_context_synthesis
+    model_routes:
+      - hermes-default
+    max_concurrency: 3
+    tailnet_address: 100.91.39.12
+    worker_version: 0.1.0
+
+  # Blackwell — heavy local inference, independent verifier.
+  # Linux host, Tailscale 100.67.126.117.
+  - node_id: rig-blackwell
+    hostname: blackwell.tail.ts.net
+    status: OFFLINE_UNVERIFIED
+    capabilities:
+      - verifier
+      - batch_reasoning
+      - code_review
+      - adversarial_review
+    model_routes:
+      - blackwell-vllm        # OpenAI-compatible vLLM. NOT Ollama.
+    max_concurrency: 2
+    tailnet_address: 100.67.126.117
+    worker_version: 0.1.0
+
+  # 28GB — deterministic auditor. Placeholder until a host is provisioned.
+  - node_id: rig-28gb
+    hostname: unknown
+    status: OFFLINE_UNVERIFIED
+    capabilities:
+      - audit
+      - gate_runner
+    max_concurrency: 1
+    worker_version: 0.1.0
+
+  # QNAP — durable storage and service host. SSH key installed 2026-07-26.
+  # Storage backbone, not a worker node.
+  - node_id: rig-qnap
+    hostname: nas94f2ae.tail.ts.net
+    status: ONLINE                       # SSH + SMB + Tailscale direct all confirmed
+    capabilities:
+      - storage
+      - artifact_backup
+      - postgres_candidate
+    max_concurrency: 1
+    lan_address: 192.168.68.84
+    tailnet_address: 100.64.83.55
+    worker_version: 0.1.0

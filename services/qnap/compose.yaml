@@ -1,0 +1,47 @@
+# QNAP service manifest — durable backing for the founder runtime.
+#
+# This stack runs the durable database on the NAS so it survives local crashes.
+# It also serves as artifact storage for ProofPackets and source snapshots.
+#
+# Deploy:
+#   ssh admin@100.64.83.55
+#   mkdir -p /share/ZFS530_DATA/rig-founder-runtime/{db,artifacts,logs}
+#   scp services/qnap/compose.yaml admin@100.64.83.55:/share/ZFS530_DATA/rig-founder-runtime/
+#   ssh admin@100.64.83.55 "cd /share/ZFS530_DATA/rig-founder-runtime && /share/ZFS530_DATA/.qpkg/container-station/bin/docker compose up -d"
+
+services:
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: rig-founder-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: founder_runtime
+      POSTGRES_USER: rig
+      POSTGRES_PASSWORD_FILE: /run/secrets/pg_password
+    secrets:
+      - pg_password
+    volumes:
+      - /share/ZFS530_DATA/rig-founder-runtime/db:/var/lib/postgresql/data
+      - /share/ZFS530_DATA/rig-founder-runtime/backups:/backups
+    ports:
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rig -d founder_runtime"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  artifact-server:
+    image: caddy:2-alpine
+    container_name: rig-artifact-server
+    restart: unless-stopped
+    volumes:
+      - /share/ZFS530_DATA/rig-founder-runtime/artifacts:/srv/artifacts:ro
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+    ports:
+      - "0.0.0.0:8088:8088"
+
+secrets:
+  pg_password:
+    file: /share/ZFS530_DATA/rig-founder-runtime/secrets/pg_password.txt

@@ -1,0 +1,78 @@
+# Work types accepted by the founder runtime.
+# Maps work_type → default required_capabilities and approval lane.
+
+work_types:
+
+  # Phase 2 — market sensing lane
+  signal_research:
+    description: "Detect a sourced market signal from public/web sources."
+    required_capabilities: [signal_research, web_scrape]
+    approval_lane: autonomous_local
+    max_attempts: 2
+    default_priority: 60
+
+  opportunity_validation:
+    description: "Validate a candidate opportunity against buyer/pain/urgency criteria."
+    required_capabilities: [vertical_research, synthesis]
+    approval_lane: autonomous_local
+    max_attempts: 2
+    default_priority: 70
+
+  # Phase 3+ — GTM/build lanes
+  offer_draft:
+    description: "Draft a $7.5K pricing-audit offer or $40K enterprise offer."
+    required_capabilities: [offer_draft, synthesis]
+    approval_lane: autonomous_local
+    max_attempts: 2
+    default_priority: 65
+
+  audit_build:
+    description: "Run a governed audit producing ProofPackets per client."
+    required_capabilities: [audit_build, verifier]
+    approval_lane: mike_approval     # client-facing, needs sign-off
+    max_attempts: 2
+    default_priority: 80
+
+  landing_build:
+    description: "Produce a dormant landing page / demo asset for a vertical."
+    required_capabilities: [landing_build, creative_qa]
+    approval_lane: autonomous_local
+    max_attempts: 2
+    default_priority: 50
+
+  experiment_design:
+    description: "Design the smallest falsifiable experiment for a candidate."
+    required_capabilities: [synthesis, strategy]
+    approval_lane: autonomous_local
+    max_attempts: 2
+    default_priority: 70
+
+  # Phase 4+ — synthesis and decision lanes
+  strategy_packet:
+    description: "Produce a DecisionPacket with sources, alternatives, recommendation."
+    required_capabilities: [strategy, decision_packet]
+    approval_lane: autonomous_local
+    max_attempts: 2
+    default_priority: 75
+
+  verification:
+    description: "Independent verification gate for any meaningful result."
+    required_capabilities: [verifier]
+    approval_lane: autonomous_local
+    max_attempts: 2
+    default_priority: 90
+
+  # Phase 6 — night compounding
+  market_map_refresh:
+    description: "Refresh a vertical market map with new signals."
+    required_capabilities: [signal_research, vertical_research]
+    approval_lane: autonomous_local
+    max_attempts: 2
+    default_priority: 40
+
+  knowledge_cleanup:
+    description: "Reconcile GBrain/Obsidian knowledge; link orphans."
+    required_capabilities: [synthesis]
+    approval_lane: autonomous_local
+    max_attempts: 1
+    default_priority: 30

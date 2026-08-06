@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "memory-os": {
+      "command": "python",
+      "args": ["-m", "founder_runtime.mcp_server"],
+      "env": {
+        "PYTHONPATH": "/Users/rig128gb/Developer/rig-intelligence-worktrees/rig-memory-os/platform/founder-runtime",
+        "RIG_MEMORY_OS_SECRET": "CHANGE_ME",
+        "RIG_MEMORY_OS_DSN": "host=/tmp port=5432 dbname=rig_memory_os_phase1",
+        "OBSIDIAN_VAULT_PATH": "/Users/rig128gb/Documents/JakeStudio",
+        "BACKUP_TARGET_QNAP": "qnap://100.64.83.55/rig-memory-backups"
+      },
+      "cwd": "/Users/rig128gb/Developer/rig-intelligence-worktrees/rig-memory-os/platform/founder-runtime"
+    }
+  }
+}

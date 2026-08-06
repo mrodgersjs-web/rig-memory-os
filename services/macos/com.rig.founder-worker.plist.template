@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  launchd service for the RIG Founder Runtime persistent worker.
+
+  Install (one per host; replace NODE_ID):
+    cp services/macos/com.rig.founder-worker.plist.template \
+       ~/Library/LaunchAgents/com.rig.founder-worker.${HOSTNAME}.plist
+    sed -i '' "s|__NODE_ID__|${HOSTNAME_SHORT}|" \
+       ~/Library/LaunchAgents/com.rig.founder-worker.${HOSTNAME}.plist
+    launchctl load -w ~/Library/LaunchAgents/com.rig.founder-worker.${HOSTNAME}.plist
+
+  One worker per node. No per-minute fanout. The dispatch_ticker below runs
+  every 60s; the worker loop heartbeats inside each lease.
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.rig.founder-worker.__NODE_ID__</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>__RUNTIME_DIR__/.venv/bin/founder-runtime</string>
+        <string>worker</string>
+        <string>--node-id</string>
+        <string>__NODE_ID__</string>
+        <string>--concurrency</string>
+        <string>2</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>__RUNTIME_DIR__</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>__RUNTIME_DIR__/.venv/bin:/Users/rig128gb/.local/bin:/usr/local/bin:/usr/bin:/bin</string>
+        <key>PYTHONUNBUFFERED</key>
+        <string>1</string>
+        <key>FOUNDER_RUNTIME_DB</key>
+        <string>__RUNTIME_DB__</string>
+        <key>FOUNDER_NODE_ID</key>
+        <string>__NODE_ID__</string>
+    </dict>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <!-- Restart on crash; throttle to 10s so we don't tight-loop a broken worker. -->
+    <key>KeepAlive</key>
+    <dict>
+        <key>SuccessfulExit</key>
+        <false/>
+        <key>Crashed</key>
+        <true/>
+    </dict>
+
+    <key>ThrottleInterval</key>
+    <integer>10</integer>
+
+    <key>StandardOutPath</key>
+    <string>__LOG_DIR__/worker.__NODE_ID__.out.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>__LOG_DIR__/worker.__NODE_ID__.err.log</string>
+
+    <key>ProcessType</key>
+    <string>Background</string>
+
+    <!-- ResourceLimits keep one worker from consuming the box. -->
+    <key>SoftResourceLimits</key>
+    <dict>
+        <key>NumberOfFiles</key>
+        <integer>4096</integer>
+    </dict>
+</dict>
+</plist>

@@ -1,0 +1,67 @@
+# Hermes cron jobs (handoff §11).
+# Hermes gateway evaluates these on a 60s tick.
+
+jobs:
+
+  - name: rig-founder-dispatch-tick
+    schedule: every_minute
+    agentic: false
+    command: founder-runtime dispatch-tick
+    description: Recover leases, lease eligible work, push priority aging.
+
+  - name: rig-signal-ingest
+    schedule: every_5_minutes
+    agentic: bounded
+    description: Normalized SignalPacket ingestion.
+
+  - name: rig-opportunity-triage
+    schedule: every_15_minutes
+    agentic: bounded
+    description: Promote/hold/merge/discard candidates.
+
+  - name: rig-founder-hourly-review
+    schedule: every_hour
+    agentic: true
+    command: founder-runtime founder-review
+    description: Up to three portfolio changes per review.
+
+  - name: rig-reserve-queue-refill
+    schedule: every_hour
+    agentic: bounded
+    description: Compound-class work when revenue work is unavailable.
+
+  - name: rig-node-health-review
+    schedule: every_5_minutes
+    agentic: false
+    description: Node health + incident creation.
+
+  - name: rig-proof-index
+    schedule: every_15_minutes
+    agentic: false
+    description: Index ProofPackets; alert on missing proofs.
+
+  - name: rig-night-compounding
+    schedule: hourly_between_2000_0500_local
+    agentic: true
+    description: Unattended research/build/evaluation missions.
+
+  - name: rig-morning-founder-brief
+    schedule: daily_0630_local
+    agentic: true
+    command: founder-runtime morning-brief
+    description: Decision-dense morning brief.
+
+  - name: rig-daily-learning-closeout
+    schedule: daily_2345_local
+    agentic: bounded
+    description: Knowledge + improvement records.
+
+  - name: rig-weekly-portfolio-review
+    schedule: weekly_monday_0600_local
+    agentic: true
+    description: Weekly focus/watch/kill review with Mike.
+
+  - name: rig-backup-state
+    schedule: daily
+    agentic: false
+    description: Database + artifact recovery bundle to QNAP.
