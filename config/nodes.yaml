@@ -130,3 +130,25 @@ nodes:
     lan_address: 192.168.68.84
     tailnet_address: 100.64.83.55
     worker_version: 0.1.0
+# ─────────────────────────────────────────────────────────────────────
+# Fleet Rotation 2026-08-08 (memory-os push by Hermes session)
+# ─────────────────────────────────────────────────────────────────────
+# Blackwell :8001: was Laguna, now DS-V4-Flash-DSSpark (commit 26caec0 on rodgemd1-lgtm fork)
+# Blackwell :8040: GLM5.2 DOWN — removed from all agent configs
+# Paid fleet wired across Hermes/Codex/omp/pi/Claude:
+#   Anthropic (claude-opus-4-5, sonnet-4-5, haiku-4-5)
+#   Z.AI Coding (glm-5.2)
+#   Xiaomi MiMo v2.5 Pro (proxy :8655)
+#   MiniMax M3 (api.minimax.io)
+#   Kimi K3 (proxy :8317, KIMI_SUB_API_KEY)
+#   HuggingFace Inference (router.huggingface.co, NEEDS HF_TOKEN)
+#   NVIDIA NIM (integrate.api.nvidia.com)
+#   Groq (api.groq.com)
+#   OpenRouter FREE only (model IDs must end in :free)
+# Hermes delegation.model: kimi-k3
+# provider_routing.fallback_chain:
+#   rig-kimi-k3/kimi-k3 → rig-zai-glm52-xhigh/glm-5.2 → rig-mimo-v25-pro-ultra/mimo-v2.5-pro →
+#   rig-minimax-m3-ultra/MiniMax-M3 → rig-blackwell-daily/blackwell-daily
+# Local state: /Users/rig128gb/.rig/state/fleet-rotation-20260808.json
+# Backups: ~/.{hermes,codex,omp,pi,claude}/*.bak-20260808T173000Z
+# Verified live: 5/5 fallback-chain entries respond HTTP 200 with auth headers.
