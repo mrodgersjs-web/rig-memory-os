@@ -25,6 +25,66 @@ model_routes:
     surfaces: [openviking, gbrain]
     role: read_only_evidence_layer
 
+  # 2026-08-08: Paid-provider fleet rotation. See /Users/rig128gb/.rig/state/fleet-rotation-20260808.json
+  # Wired across Hermes/Codex/omp/pi/Claude with key_env references in ~/.hermes/.env.
+  paid-fleet:
+    type: cloud_router
+    policy: "local-first; paid only when local cannot pass acceptance or per-task routing decision"
+    fallback_chain:                       # tried in order by Hermes delegation.model
+      - rig-kimi-k3/kimi-k3                # Kimi K3 (Code Plan sub, proxy :8317)
+      - rig-zai-glm52-xhigh/glm-5.2         # Z.AI GLM 5.2 (coding plan, proxy :8652)
+      - rig-mimo-v25-pro-ultra/mimo-v2.5-pro   # Xiaomi MiMo v2.5 Pro (proxy :8655)
+      - rig-minimax-m3-ultra/MiniMax-M3     # MiniMax M3 (direct, api.minimax.io)
+      - rig-blackwell-daily/blackwell-daily    # Blackwell DS-V4-Flash-DSSpark (LAN, :8001)
+    providers:
+      anthropic-api:
+        api: anthropic-messages
+        base_url: https://api.anthropic.com
+        env_key: ANTHROPIC_API_KEY
+        models: [claude-opus-4-5, claude-sonnet-4-5, claude-haiku-4-5]
+      zai-direct:
+        api: openai_compatible
+        base_url: https://api.z.ai/api/coding/paas/v4
+        env_key: ZAI_API_KEY
+        models: [glm-5.2]
+      mimo-direct:
+        api: openai_compatible
+        base_url: http://127.0.0.1:8655/v1
+        env_key: MIMO_API_KEY
+        models: [mimo-v2.5-pro]
+      minimax-direct:
+        api: openai_compatible
+        base_url: https://api.minimax.io/v1
+        env_key: MINIMAX_API_KEY
+        models: [MiniMax-M3]
+      kimi-direct:
+        api: openai_compatible
+        base_url: http://127.0.0.1:8317/v1
+        env_key: KIMI_SUB_API_KEY
+        models: [kimi-k3, kimi-k2.7-code, kimi-k2.5]
+      huggingface:
+        api: openai_compatible
+        base_url: https://router.huggingface.co/v1
+        env_key: HF_TOKEN
+        models: [Qwen/Qwen3-Coder-480B-A35B-Instruct, Qwen/Qwen3-235B-A22B-Instruct-2507]
+        status: NEEDS_KEY
+      nvidia-nim:
+        api: openai_compatible
+        base_url: https://integrate.api.nvidia.com/v1
+        env_key: NVIDIA_API_KEY
+        models: [nvidia/llama-3.1-nemotron-70b-instruct, meta/llama-3.3-70b-instruct]
+      groq-api:
+        api: openai_compatible
+        base_url: https://api.groq.com/openai/v1
+        env_key: GROQ_API_KEY
+        models: [llama-3.3-70b-versatile, mixtral-8x7b-32768]
+      openrouter-free:
+        api: openai_compatible
+        base_url: https://openrouter.ai/api/v1
+        env_key: OPENROUTER_API_KEY
+        policy: "FREE-only; model IDs must end in :free"
+        models: [meta-llama/llama-3.3-70b-instruct:free, qwen/qwen-2.5-coder-32b-instruct:free, google/gemini-2.0-flash-exp:free]
+
 cloud_escalation:
   requires_evidence: true
   requires_mike_approval: false          # Mike has already approved in policy
