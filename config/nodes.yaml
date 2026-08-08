@@ -92,20 +92,45 @@ nodes:
     worker_version: 0.1.0
 
   # Blackwell — heavy local inference, independent verifier.
-  # Linux host, Tailscale 100.67.126.117.
+  # Linux host, 3x RTX PRO 6000 Blackwell 96GB, Tailscale 100.67.126.117.
+  # DS-V4-Flash-DSSpark serving on :8001 with 262K context, tool calling, ~91 tok/s.
   - node_id: rig-blackwell
     hostname: blackwell.tail.ts.net
-    status: OFFLINE_UNVERIFIED
+    status: ONLINE
     capabilities:
       - verifier
       - batch_reasoning
       - code_review
       - adversarial_review
+      - frontier_inference
+      - long_context
+      - tool_calling
+      - coding
     model_routes:
-      - blackwell-vllm        # OpenAI-compatible vLLM. NOT Ollama.
-    max_concurrency: 2
+      - blackwell-daily       # DS-V4-Flash-DSSpark on :8001 (262K ctx, OpenAI-compatible)
+      - blackwell-coder       # KAT-Coder-V2.5-Dev on :8003 (131K ctx)
+      - blackwell-strategy    # GLM-5.2-REAP50-Q3-GGUF on :8038 (1M ctx, llama.cpp)
+      - blackwell-swarm       # Qwen3-Coder-30B on :8030-8032 (parallel research)
+    max_concurrency: 8
+    lan_address: 192.168.68.90
     tailnet_address: 100.67.126.117
     worker_version: 0.1.0
+    endpoints:
+      daily: "http://192.168.68.90:8001/v1"
+      coder: "http://192.168.68.90:8003/v1"
+      strategy: "http://192.168.68.90:8038/v1"
+      swarm: "http://192.168.68.90:8030/v1"
+      tailscale_daily: "http://100.67.126.117:8001/v1"
+    current_model: "blackwell-daily"
+    model_details:
+      name: "DeepSeek-V4-Flash-DSSpark"
+      context_length: 262144
+      kv_cache_tokens: 517591
+      tensor_parallel: 2
+      throughput_tok_s: 91
+      tool_calling: true
+      streaming: true
+    notes: "DS-V4 online 2026-08-08. All self-healing deleted. Spec decoding blocked by sm_120a sparse MLA kernel (num_tokens>64 req). See HANDOFF.md."
 
   # 28GB — deterministic auditor. Placeholder until a host is provisioned.
   - node_id: rig-28gb
