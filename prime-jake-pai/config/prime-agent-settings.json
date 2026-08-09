@@ -1,0 +1,12 @@
+{
+  "defaultProvider": "huggingface",
+  "defaultModel": "deepseek-ai/DeepSeek-V3.2",
+  "recentModels": [
+    "huggingface/deepseek-ai/DeepSeek-V3.2"
+  ],
+  "skills": [
+    "/home/user/.prime/agent/skills/jake-pai-doctrine",
+    "/home/user/.prime/agent/skills/mrodgersjs-web",
+    "/home/user/.prime/agent/skills/prime-jake-pai"
+  ]
+}
