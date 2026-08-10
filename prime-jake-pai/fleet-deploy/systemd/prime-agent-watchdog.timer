@@ -1,0 +1,12 @@
+[Unit]
+Description=Prime Agent — Always-On Daemon Watchdog Timer
+Requires=prime-agent-watchdog.service
+
+[Timer]
+# Check every 30 seconds, starting 10s after boot
+OnBootSec=10
+OnUnitActiveSec=30
+AccuracySec=5
+
+[Install]
+WantedBy=timers.target

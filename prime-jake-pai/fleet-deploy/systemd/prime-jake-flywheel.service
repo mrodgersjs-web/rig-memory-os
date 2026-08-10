@@ -1,0 +1,16 @@
+[Unit]
+Description=Prime Jake — Continuous Data Flywheel
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /home/user/.rig/scripts/continuous_flywheel.py --daemon --interval 14400
+WorkingDirectory=/home/user
+Environment=PATH=/home/user/.hermes/node/bin:/home/user/.local/bin:/usr/bin:/usr/local/bin
+Environment=HOME=/home/user
+Restart=always
+RestartSec=60
+
+[Install]
+WantedBy=default.target

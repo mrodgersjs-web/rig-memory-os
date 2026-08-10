@@ -1,0 +1,45 @@
+{
+  "rounds": [
+    {
+      "round": 1,
+      "loss": "0.809",
+      "adapter": "/home/user/rig-ft/output/round1/adapter_model.safetensors"
+    },
+    {
+      "round": 2,
+      "loss": "0.8487"
+    },
+    {
+      "round": 3,
+      "loss": "1.038"
+    },
+    {
+      "round": 4,
+      "loss": "1.021"
+    },
+    {
+      "round": 5,
+      "loss": "0.8912"
+    },
+    {
+      "round": 6,
+      "loss": "0.9817"
+    },
+    {
+      "round": 7,
+      "loss": "0.9561"
+    },
+    {
+      "round": 8,
+      "loss": "0.955"
+    },
+    {
+      "round": 9,
+      "loss": "1.008"
+    },
+    {
+      "round": 10,
+      "loss": "1.086"
+    }
+  ]
+}

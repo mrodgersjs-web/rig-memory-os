@@ -1,0 +1,48 @@
+base_model: /home/user/hf-cache/KAT-Coder-V2.5-Dev
+model_type: qwen3_5_moe
+tokenizer_type: AutoTokenizer
+trust_remote_code: true
+adapter: lora
+lora_r: 128
+lora_alpha: 256
+lora_dropout: 0.05
+lora_target_modules:
+  - q_proj
+  - k_proj
+  - v_proj
+  - o_proj
+  - gate_proj
+  - up_proj
+  - down_proj
+datasets:
+  - path: /home/user/rig-ft/data/train_round2.jsonl
+    type: conversation
+    field_messages: messages
+train_on_inputs: false
+sequence_len: 4096
+sample_packing: false
+micro_batch_size: 1
+gradient_accumulation_steps: 4
+num_epochs: 1
+optimizer: adamw_torch
+learning_rate: 5e-5
+lr_scheduler: cosine
+warmup_steps: 50
+weight_decay: 0.01
+bf16: true
+attn_implementation: sdpa
+flash_attention: false
+torch_compile: false
+use_liger_kernel: true
+gradient_checkpointing: true
+output_dir: /home/user/rig-ft/output/round2
+save_steps: 200
+save_total_limit: 2
+logging_steps: 10
+eval_steps: 999
+eval_sample_packing: false
+dataloader_pin_memory: false
+dataloader_num_workers: 0
+dataset_prepared_dir: /home/user/rig-ft/prepared_v3
+env:
+  PYTORCH_CUDA_ALLOC_CONF: expandable_segments:True

@@ -1,0 +1,53 @@
+# Round 6: Continual learning on Round 1 data with decaying LR
+base_model: /home/user/hf-cache/KAT-Coder-V2.5-Dev
+model_type: qwen3_5_moe
+tokenizer_type: AutoTokenizer
+trust_remote_code: true
+adapter: lora
+lora_r: 128
+lora_alpha: 256
+lora_dropout: 0.05
+lora_target_modules:
+  - q_proj
+  - k_proj
+  - v_proj
+  - o_proj
+  - gate_proj
+  - up_proj
+  - down_proj
+lora_init_dir: /home/user/rig-ft/output/round5
+datasets:
+  - path: /home/user/rig-ft/data/train_round1.jsonl
+    type: chat_template
+    field_messages: messages
+    message_property_mappings:
+      role: role
+      content: content
+train_on_inputs: false
+sequence_len: 4096
+sample_packing: true
+micro_batch_size: 1
+gradient_accumulation_steps: 4
+num_epochs: 1
+optimizer: adamw_torch
+learning_rate: 1e-5
+lr_scheduler: cosine
+warmup_steps: 50
+weight_decay: 0.01
+bf16: true
+attn_implementation: sdpa
+flash_attention: false
+torch_compile: false
+use_liger_kernel: true
+gradient_checkpointing: true
+output_dir: /home/user/rig-ft/output/round6
+save_steps: 200
+save_total_limit: 2
+logging_steps: 10
+eval_steps: 999
+eval_sample_packing: false
+dataloader_pin_memory: false
+dataloader_num_workers: 0
+dataset_prepared_dir: /home/user/rig-ft/prepared_v5
+env:
+  PYTORCH_CUDA_ALLOC_CONF: expandable_segments:True

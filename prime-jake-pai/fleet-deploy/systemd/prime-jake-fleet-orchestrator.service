@@ -1,0 +1,16 @@
+[Unit]
+Description=Prime Jake — 24/7 Fleet Orchestrator
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /home/user/.rig/scripts/fleet_orchestrator.py --daemon --interval 60
+WorkingDirectory=/home/user
+Environment=PATH=/home/user/.hermes/node/bin:/home/user/.local/bin:/usr/bin:/usr/local/bin
+Environment=HOME=/home/user
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target

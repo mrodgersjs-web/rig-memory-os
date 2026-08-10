@@ -1,0 +1,16 @@
+[Unit]
+Description=Prime Agent — Always-On Daemon Watchdog
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=oneshot
+ExecStart=/home/user/.rig/scripts/prime-agent-watchdog.sh
+WorkingDirectory=/home/user
+Environment="PATH=/home/user/.hermes/node/bin:/home/user/.local/bin:/usr/bin:/usr/local/bin:/home/user/.cargo/bin"
+Environment="HOME=/home/user"
+Environment="PRIME_AGENT_CODING_AGENT_DIR=/home/user/.prime/agent"
+
+[Install]
+WantedBy=default.target
