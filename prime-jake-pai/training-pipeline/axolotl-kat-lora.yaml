@@ -1,0 +1,64 @@
+# axolotl LoRA config — fine-tune KAT-Coder-V2.5-Dev (builder lane) on agent traces
+# Target: 35B/3B MoE (Qwen3.6-35B-A3B base), LoRA on 3×96GB Blackwell (sm_120)
+# Run:  accelerate launch -m axolotl.cli.train axolotl-kat-lora.yaml
+base_model: /home/user/hf-cache/KAT-Coder-V2.5-Dev
+model_type: AutoModelForCausalLM
+tokenizer_type: AutoTokenizer
+
+# LoRA (MoE: target expert + attention projections)
+adapter: lora
+lora_r: 16
+lora_alpha: 32
+lora_dropout: 0.05
+lora_target_modules:
+  - q_proj
+  - k_proj
+  - v_proj
+  - o_proj
+  - gate_proj
+  - up_proj
+  - down_proj
+
+# Data: agent traces normalized to chat JSONL (see traces_to_sft.py)
+datasets:
+  - path: /home/user/rig-ft/data/train_final.jsonl
+    type: chat_template
+    field_messages: messages
+    message_field_role: role
+    message_field_content: content
+train_on_inputs: false  # mask to assistant turns only (tool outputs excluded from loss)
+
+# Sequence + batching
+sequence_len: 8192
+sample_packing: true
+micro_batch_size: 1
+gradient_accumulation_steps: 8
+num_epochs: 1
+
+# Optimizer (MoE-friendly)
+optimizer: adamw_torch
+learning_rate: 2e-4
+lr_scheduler: cosine
+warmup_steps: 20
+weight_decay: 0.01
+
+# sm_120 / Blackwell
+bf16: true
+torch_compile: false  # avoid sm_120 torch.compile issues during FT
+flash_attention: false  # FA2 segfaults on sm_120; use SDPA
+sdp_attention: true
+use_liger_kernel: true  # memory-efficient MoE kernels
+
+# Checkpointing
+output_dir: /home/user/rig-ft/output/kat-lora-v2
+save_steps: 200
+save_total_limit: 2
+logging_steps: 10
+eval_steps: 200
+eval_sample_packing: false
+
+# DeepSpeed (CPU offload to 125GB RAM if needed)
+deepspeed: /home/user/rig-ft/ds_zero3_offload.json
+
+# Tokenization (avoid deadlock on huge datasets)
+num_proc: 8
